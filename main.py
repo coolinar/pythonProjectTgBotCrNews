@@ -112,7 +112,6 @@ def suggest_currencies(input_str, currency_dict):
     return suggestions[:5]
 
 
-
 # Основная функция программы
 def main():
     database = "currencies.db"
