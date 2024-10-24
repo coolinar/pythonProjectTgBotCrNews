@@ -91,25 +91,21 @@ def convert_currency(base_currency, quote_currency, amount, currency_dict):
 
 # Функция для подсказок валют на основе введенного пользователем текста
 def suggest_currencies(input_str, currency_dict):
-    # Список приоритетных криптовалют
-    prioritized = ['bitcoin', 'ethereum', 'tether', 'usd-coin', 'solana', 'cardano', 'polkadot', 'ripple', 'dogecoin', 'toncoin', 'mantle']
+    prioritized = ['bitcoin', 'ethereum', 'tether', 'usd-coin', 'solana', 'cardano', 'polkadot', 'ripple', 'dogecoin',
+                   'megaton-finance-wrapped-toncoin', 'mantle']
 
-    # Прямое совпадение по имени
     exact_matches = [k for k in currency_dict.keys() if k == input_str.lower()]
-
-    # Совпадение по начальным символам
     startswith_matches = [k for k in currency_dict.keys() if k.startswith(input_str.lower()) and k not in exact_matches]
+    partial_matches = [k for k in currency_dict.keys() if
+                       input_str.lower() in k and k not in startswith_matches and k not in exact_matches]
 
-    # Частичные совпадения, где строка содержится внутри названия валюты
-    partial_matches = [k for k in currency_dict.keys() if input_str.lower() in k and k not in startswith_matches and k not in exact_matches]
+    # Фильтруем только основные криптовалюты и допустимые варианты
+    filtered_matches = [k for k in exact_matches + startswith_matches + partial_matches if
+                        k in prioritized or is_supported_currency(k, currency_dict)]
 
-    # Сортируем: сначала приоритетные криптовалюты
-    sorted_matches = sorted(exact_matches + startswith_matches + partial_matches, key=lambda x: (x not in prioritized, x))
+    sorted_matches = sorted(filtered_matches, key=lambda x: (x not in prioritized, x))
 
-    # Ограничиваем список до 5 элементов и включаем приоритетные
-    suggestions = sorted([s for s in sorted_matches if s in prioritized] + sorted_matches[:5], key=lambda x: x not in prioritized)
-
-    return suggestions[:5]
+    return sorted_matches[:5]
 
 
 # Основная функция программы
